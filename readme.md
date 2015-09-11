@@ -1,26 +1,9 @@
 phpmyadmin:
 http://s81.vdl.pl/phpmyadmin/
 
-login: moczniak_student
-haslo: moczniak_grupa1
+login: moczniak_inz
+haslo: inzynier
 
-FTP:
-host: s81.vdl.pl
-login: student@moczniak.org
-haslo: grupa1
-
-
-Jesli chcesz sie tu bawic to sie baw, ale jak cos zmienisz to daj znac^^
-jesli chcesz sie bawic tym projektem na swoim lokalnym serwerze, to musisz miec php 5.4> z zainstalowanym composerem.
-
-wchodzisz na bitbucketa mego: https://bitbucket.org/moczniak/ocenprocent
-klonujesz go na kompa swego, wrzucasz wypakowane pliki na swoj serwer wbijasz w niego w konsoli i wklepujesz
-composer update
-
-jesli masz composera zainstalowanego globalnie^^ jesli lokalnie to wklepujesz
-php composer.phar update
-
-powinny ci sie posciagac paczuszki i projekt gotowy, nie zapomnij bazy sobie wrzucic na swojego mysql'a i zmienic danych w config/database.php w sekcji mysql
 
 
 
