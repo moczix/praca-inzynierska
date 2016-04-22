@@ -20,9 +20,12 @@ return [
 	'emailAlreadyUser' => 'Adres email jest zajęty',
 	'CheckUrEmail' => 'Sprawdź skrzynkę email by aktywować konto',
 	'emailActivateSubject' => 'SRZK Aktywacja konta',
-	'emailActivateFrom' => 'SRZK',
+	'emailFrom' => 'SRZK',
 	'emailActivationTextLink' => 'Kliknij w link by aktywować konto na SRZK :link',
 	'usernameAlphaNum' => 'Nazwa użytkownika może zawierać znaki alfanumeryczne',
+	
+	
+	'senderEmail' => 'moczniak@gmail.com',
 	
 	
 	

@@ -29,6 +29,7 @@
 				<tr>
 				  <th>#</th>
 				  <th>Nazwa</th>
+				  <th>Klucz</th>
 				  <th>Użytkownicy</th>
 				  <th>Akcja</th>
 				</tr>
@@ -38,6 +39,7 @@
 				<tr>
 					<td>{!! $Counter++ !!}</td>
 					<td>{!! $gr->name !!}</td>
+					<td>{!! $gr->groupCode !!}</td>
 					<td>{!! $gr->userCount  !!}</td>
 					<td><a href="{!! URL::to('/admin/delGroup', array($gr->group_id)) !!}">Skasuj</a></td>
 				</tr>
@@ -45,7 +47,9 @@
 				@endforeach
 			  </tbody>
 			</table>
-			
+			<div class="text-center">
+				{!! $groupList->render(new \Illuminate\Pagination\BootstrapThreePresenter($groupList)) !!}
+			</div>
 		</div>
 	</div>
 	</div>
@@ -66,6 +70,10 @@
 			  <div class="form-group">
 				<label for="groupForm">Nazwa Grupy</label>
 				<input type="text" class="form-control" id="groupForm" placeholder="Nazwa Grupy">
+			  </div>
+			  <div class="form-group">
+				<label for="groupForm">Klucz Grupy</label>
+				<input type="text" class="form-control" id="groupKey" placeholder="Klucz Grupy">
 			  </div>
 			
 			
@@ -90,7 +98,8 @@
 $('.addGroup').click(function(e){
 $.post("{!! URL::to('/admin/addNewGroup') !!}",
 		{ 	_token : $('#addGroupForm input[name=_token]').val(),
-						groupName : $('#addGroupForm #groupForm').val()
+						groupName : $('#addGroupForm #groupForm').val(),
+						keyGroup : $('#addGroupForm #groupKey').val()
 		},		 
 			function(data){
 				if(data == ""){

@@ -65,14 +65,14 @@
 				  <td>{!! $Counter++ !!}</td>
 				  <td>{!! $hs->user->username !!}</td>
 				  <td>{!! date('Y-m-d H:i:s',$hs->date) !!}</td>
-				  <td><a href="#" class="showMeS" id="{!! $hs->log_id !!}" data-toggle="modal" data-target="#showMe">Pokaż</a></td>
+				  <td><a href="{!! url::to('admin/getDetailsHistory',array('id'=>$hs->log_id)) !!}" target="_blank">Pokaż</a></td> 
 				  <td><a href="{!! url::to('admin/delHistory',array('id'=>$hs->log_id)) !!}">Skasuj</a></td>
 				</tr>
 				@endforeach;
 
 			  </tbody>
 			</table>
-			
+
 		</div>
 	</div>
 	</div>

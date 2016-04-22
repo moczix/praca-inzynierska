@@ -110,7 +110,7 @@ class Job extends Model{
 	public function jobList()
 	{
 		
-		return Job::all();
+		return Job::paginate(30);
 	}
 
 	public function changeStatus($id)

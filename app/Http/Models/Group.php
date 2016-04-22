@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Lang;
 
 
+use App\Http\Models\User;
+
 class Group extends Model{
 
 
 	protected $table = 'group';
-    protected $fillable = array('group_id','name');
+    protected $fillable = array('group_id','name','groupCode');
 	//protected $hidden = ['password', 'activate_token'];
 	public  $timestamps = false;
 	protected $primaryKey = 'group_id';
@@ -67,12 +69,27 @@ class Group extends Model{
 		
 	}
 	
-	public function addNew()
+	public function setUserByKey($key,$user)
+	{
+		$group = Group::where('groupCode',$key)->get();
+		if(count($group))
+		{
+			$userz = User::find($user);
+			if(count($userz))
+			{
+				$userz->group_id = $group[0]->group_id;
+				$userz->save();
+			}
+		}		
+	}
+	
+	public function addNewGroup()
 	{
 		$exist = Group::where('name',Input::get('groupName'))->count();
 		if(!$exist){
 			$kat = new Group();
 			$kat->name = Input::get('groupName');
+			$kat->groupCode = Input::get('keyGroup');
 			$kat->save();
 		}else throw new \Exception('Istnieje już grupa o tej nazwie');
 	}
@@ -80,7 +97,7 @@ class Group extends Model{
 	
 	public function groupList()
 	{
-		$category = Group::with('userCount')->get();
+		$category = Group::with('userCount')->paginate(30);
 		return $category;
 	}
 	

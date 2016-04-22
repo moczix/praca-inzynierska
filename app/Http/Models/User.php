@@ -20,7 +20,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 use Authenticatable, CanResetPassword;
 
 	protected $table = 'user';
-    protected $fillable = array('uuid','username', 'password', 'email', 'activate_token', 'active', 'admin', 'remember_token','adminCreated','showPassword');
+    protected $fillable = array('uuid','username', 'password', 'email', 'activate_token', 'active', 'admin', 'remember_token','adminCreated','showPassword', 'hand','device','keyboard','gender','birth','birthString');
 	//protected $hidden = ['password', 'activate_token'];
 	public  $timestamps = false;
 	protected $primaryKey = 'uuid';
@@ -30,7 +30,7 @@ use Authenticatable, CanResetPassword;
 	{
 		return $this->hasOne('App\Http\Models\Group', 'group_id','group_id');
 	}
-		
+	
 		
 	public function info($id)
 	{
@@ -40,7 +40,51 @@ use Authenticatable, CanResetPassword;
 		//echo '</pre>';
 		return $user;
 	}	
+	
+	
+	public function getSettings($id)
+	{
+		return User::find($id);
 		
+	}
+	
+	public function changeSettings()
+	{
+		$hand = Input::get('hand');
+		$keyboard = Input::get('keyboard');
+		$device = Input::get('device');
+		$birth = Input::get('birth');
+		$gender = Input::get('gender');
+		
+		if(($hand == 1 || $hand == 2) && ($keyboard == 1 || $keyboard == 2) && ($device == 1 || $device == 2) && ($gender == 1 || $gender == 2))
+		{
+			try
+			{
+			$ex = explode('/',$birth);
+				if(count($ex) > 1)
+				{
+					$stringData = $ex[0].'/'.$ex[1].'/'.$ex[2];
+					$data = strtotime($ex[2].'-'.$ex[1].'-'.$ex[0]);
+					$user = User::find(Auth::id());
+					$user->hand = $hand;
+					$user->device = $device;
+					$user->keyboard = $keyboard;
+					$user->gender = $gender;
+					$user->birth = $data;
+					$user->birthString = $stringData;
+					$user->save();
+				}
+				else
+				{
+					throw new \Exception("gowno!".$birth);
+				}
+			}
+			catch(\Exception $e)
+			{
+				throw new \Exception($e->getMessage());
+			}
+		}
+	}
 		
 	public function login(){ 
 		$exist = User::where('username', Input::get('username'))->count();
@@ -68,15 +112,94 @@ use Authenticatable, CanResetPassword;
 		
 	}
 		
+		
+	public function forgetPassword()
+	{
+		$user = User::where('email',Input::get('email'))->get();
+		if(count($user))
+		{	
+			$user = User::find($user[0]->uuid);
+			$string = str_random(8);
+			$user->password = Hash::make($string);
+			$mailTxt = "Twoja nazwa użytkownika to: ".$user->username."  ,nowe hasło to: ".$string."    Zaloguj się a potem możesz zmienić je w panelu użytkownika";
+				Mail::raw($mailTxt, function($message) use($user)
+				{
+					$message->subject('Nowe hasło');
+					$message->from(Lang::get('msg.senderEmail'), Lang::get('msg.emailFrom'));
+					$message->to($user->email);
+				});
+			$user->save();
+			
+		}
+		else
+		{
+			throw new \Exception('Nie ma takiego emaila');
+		}
+	}
+	
+	public function changeAdminPSW($newPSW)
+	{
+		$user = User::find(5);//5 uuid admina
+		$user->password = Hash::make($newPSW);
+		$user->save();
+	}
 	
 	public function changePassword()
 	{
 		try
+		{	
+			$proceed = (Auth::id() == Input::get('user'))? 1 : 0;
+			if($proceed == 0)
+			{
+				$proceed = (Auth::admin())? 1 : 0;
+			}
+			if($proceed)
+			{
+				$user = User::find(Input::get('user'));
+				$user->password = Hash::make(Input::get('psw'));
+				$user->showPassword = Input::get('psw');
+				
+				//wyslac mejla!!!
+				$mailTxt = 'Twoje hasło zostało zmienione na następujące: '.Input::get('psw');
+				Mail::raw($mailTxt, function($message) use($user)
+				{
+					$message->subject('Twoje hasło zostało zmienione!');
+					$message->from(Lang::get('msg.senderEmail'), Lang::get('msg.emailFrom'));
+					$message->to($user->email);
+				});
+				$user->save();
+			}
+		}
+		catch(\Exception $e)
 		{
-			$user = User::find(Input::get('user'));
-			$user->password = Hash::make(Input::get('psw'));
-			$user->showPassword = Input::get('psw');
-			$user->save();
+			throw new \Exception($e->getMessage());
+		}
+	}
+	
+	
+	public function changeEmail()
+	{
+		try
+		{
+			$proceed = (Auth::id() == Input::get('user'))? 1 : 0;
+			if($proceed == 0)
+			{
+				$proceed = (Auth::admin())? 1 : 0;
+			}
+			if($proceed)
+			{
+				$exist = User::where('email', Input::get('email'))->get();
+				if(count($exist) == 0)
+				{
+					$user = User::find(Input::get('user'));
+					$user->email = Input::get('email');
+					$user->save();
+				}
+				else
+				{
+					throw new \Exception('Podany adres jest już w użyciu!');
+				}
+			}
 		}
 		catch(\Exception $e)
 		{
@@ -115,7 +238,7 @@ use Authenticatable, CanResetPassword;
 						Mail::raw($mailTxt, function($message)
 						{
 							$message->subject(Lang::get('msg.emailActivateSubject'));
-							$message->from('moczniak@gmail.com', Lang::get('msg.emailActivateFrom'));
+							$message->from(Lang::get('msg.senderEmail'), Lang::get('msg.emailFrom'));
 							$message->to(Input::get('email'));
 						});
 					}
@@ -128,6 +251,8 @@ use Authenticatable, CanResetPassword;
 					}
 
 					$user->save();
+					$group = new Group();
+					$group->setUserByKey(Input::get('keyGroup'),$user->id);
 					if($admin == 0)
 					{
 						return Lang::get('msg.CheckUrEmail');
@@ -185,18 +310,18 @@ use Authenticatable, CanResetPassword;
 	
 	public function activeUserList()
 	{
-		$user = User::where('uuid','!=',Auth::id())->where('active','1')->with('group')->get();
+		$user = User::where('uuid','!=',Auth::id())->where('active','1')->with('group')->paginate(30);
 		return $user;
 	}
 	public function noActiveUserList()
 	{
-		$user = User::where('uuid','!=',Auth::id())->where('active','0')->with('group')->get();
+		$user = User::where('uuid','!=',Auth::id())->where('active','0')->with('group')->paginate(30);
 		return $user;
 	}
 
 	public function usersList()
 	{
-		$user = User::where('uuid','!=',Auth::id())->with('group')->get();
+		$user = User::where('uuid','!=',Auth::id())->with('group')->paginate(30);
 		return $user;		
 	}
 	

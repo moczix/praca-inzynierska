@@ -38,6 +38,7 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
       <ul class="nav navbar-nav">
 		<li  class="{!! Request::is('user/panel') ? 'active' : '' !!}"><a href="{!! url::to('user/panel') !!}">Zadania</a></li>
+		<li  class="{!! Request::is('user/settings') ? 'active' : '' !!}"><a href="{!! url::to('user/settings') !!}">Konto</a></li>
       </ul>
 
       <ul class="nav navbar-nav navbar-right">

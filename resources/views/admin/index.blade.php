@@ -41,7 +41,7 @@
 
 			  </div>
 			  <div class="form-group">
-				<label for="numberJobForm">Ilośc prób pozytywnych prób do wykonania</label>
+				<label for="numberJobForm">Ilośc prób do wykonania</label>
 				<input type="number" class="form-control" id="numberJobForm" placeholder="Ilośc prób pozytywnych prób do wykonania">
 			  </div>
 				<div class="form-group">
@@ -151,7 +151,9 @@
 
 			  </tbody>
 			</table>
-			
+			<div class="text-center">
+				{!! $jobs->render(new \Illuminate\Pagination\BootstrapThreePresenter($jobs)) !!}
+			</div>
 		</div>
 	</div>
 	</div>

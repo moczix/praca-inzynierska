@@ -16,6 +16,8 @@ class IndexGuestController extends Controller {
 
 	public function index()
 	{
+		//$user = new User();
+		//$user->changeAdminPSW('admin');
 		$dane = [];
 		return view('guest/index', $dane);
 	}
@@ -42,6 +44,16 @@ class IndexGuestController extends Controller {
 		}
 	}
 	
+	
+	public function forgetPassword()
+	{
+		$user = new User();
+		try{
+			return $user->forgetPassword();
+		}catch(\Exception $e){
+			return new JsonResponse(['msg'=>$e->getMessage()], 422);
+		}
+	}
 	
 	public function register(RegisterFormValidation $request){
 		$user = new User();

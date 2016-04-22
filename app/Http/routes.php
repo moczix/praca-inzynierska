@@ -38,6 +38,8 @@ Route::group(array('namespace' => 'Admin', 'middleware'=>'adminAuth', 'prefix'=>
 	
 	Route::post('changePSW', 'IndexAdminController@changePasswordUser');
 	
+	Route::post('changeEmail', 'IndexAdminController@changeEmailUser');
+	
 	Route::get('delHistory/{id}', 'IndexAdminController@deleteHistory')->where('id','[0-9]+');
 });
 
@@ -45,8 +47,18 @@ Route::group(array('namespace' => 'Admin', 'middleware'=>'adminAuth', 'prefix'=>
 Route::group(array('namespace' => 'User', 'middleware'=>'userAuth', 'prefix'=>'user'), function(){
 	
 	Route::get('panel', 'IndexUserController@index');
+	Route::get('settings', 'IndexUserController@userSettings');
+	
+	
 	Route::get('doJob/{id}', 'IndexUserController@doJobPage')->where('id','[0-9]+');
 	Route::post('completeJob', 'IndexUserController@completeJob');
+	
+	Route::post('changePSW', 'IndexUserController@changePasswordUser');
+	Route::post('changeEmail', 'IndexUserController@changeEmailUser');
+	Route::get('getDetailsHistory/{id}', 'IndexUserController@getHistory')->where('id','[0-9]+');
+	
+	
+	Route::post('changeSettings', 'IndexUserController@changeSettings');
 	
 });
 
@@ -59,5 +71,7 @@ Route::group(array('namespace' => 'Guest'), function(){
 	
 	Route::get('logout',   'IndexGuestController@logout');
 	
+	
+	Route::post('forgetPSW', 'IndexGuestController@forgetPassword');
 	
 });

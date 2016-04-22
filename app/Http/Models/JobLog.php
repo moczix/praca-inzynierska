@@ -43,7 +43,80 @@ class JobLog extends Model{
 		try
 		{
 			$jobLog = JobLog::find($id);
-			return print_r(json_decode($jobLog->result,true),true);
+			$dane = json_decode($jobLog->result,true);
+			
+			
+			$correct = [];
+			$incorrect = [];
+			$improve = [];
+
+			if(!empty($dane['attempt']['correct']))
+			{
+				foreach($dane['attempt']['correct'] as $as)// po poprawnych
+				{
+					$string = "";
+					foreach($as as $sa)
+					{
+						$string .= '{';
+						foreach($sa as $zz)
+						{
+							$string .= $zz.',';
+						}	
+						$string = substr($string, 0, -1);
+						$string .= '},';						
+					}
+					$string = substr($string, 0, -1);
+					$correct[] = $string ;
+				}	
+			}
+			
+			
+			if(!empty($dane['attempt']['incorrect']))
+			{
+				foreach($dane['attempt']['incorrect'] as $as)// po poprawnych
+				{
+					$string = "";
+					foreach($as as $sa)
+					{
+						$string .= '{';
+						foreach($sa as $zz)
+						{
+							$string .= $zz.',';
+						}	
+						$string = substr($string, 0, -1);
+						$string .= '},';						
+					}
+					$string = substr($string, 0, -1);
+					$incorrect[] = $string ;
+				}	
+			}
+			
+			if(!empty($dane['attempt']['improve']))
+			{
+				foreach($dane['attempt']['improve'] as $as)// po poprawnych
+				{
+					$string = "";
+					foreach($as as $sa)
+					{
+						$string .= '{';
+						foreach($sa as $zz)
+						{
+							$string .= $zz.',';
+						}	
+						$string = substr($string, 0, -1);
+						$string .= '},';						
+					}
+					$string = substr($string, 0, -1);
+					$improve[] = $string ;
+				}	
+			}
+
+
+			$newArray = array("job"=>$dane['job'], "nazwa"=>$dane['name'], "tekst"=>$dane['text'], "attempts"=>array("correct"=>$correct ,"incorrect"=>$incorrect ,"improve"=>$improve));
+			echo '<pre>';
+			 return print_r($newArray,true);
+			echo '</pre>';
+			//return print_r(json_decode($jobLog->result,true),true);
 		}
 		catch(\Exception $e)
 		{
@@ -72,7 +145,7 @@ class JobLog extends Model{
 	
 	public function getHistoryByUser($id)
 	{
-		return JobLog::where('uuid',$id)->get();
+		return JobLog::where('uuid',$id)->paginate(30);
 	}
 	
 	public function getHistory($id)

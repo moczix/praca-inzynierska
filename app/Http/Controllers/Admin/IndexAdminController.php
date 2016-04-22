@@ -14,6 +14,8 @@ use App\Http\Requests\EditJobFormValidation;
 
 use App\Http\Requests\ChangePasswordFormValidation;
 
+use App\Http\Requests\ChangeEmailFormValidation;
+
 use Illuminate\Http\JsonResponse;
 
 use Auth;
@@ -42,6 +44,20 @@ class IndexAdminController extends Controller {
 		
 	}
 	
+	public function changeEmailUser(ChangeEmailFormValidation $request)
+	{
+		$user = new User();
+		try
+		{
+			$user->changeEmail();
+		}
+		catch(\Exception $e)
+		{
+			return new JsonResponse(['msg'=>$e->getMessage()],422);
+		}
+		
+	}
+	
 	
 	
 	public function showUser($id)
@@ -49,7 +65,7 @@ class IndexAdminController extends Controller {
 		$jobLog = new JobLog();
 		$user = new User();
 		$group = new Group();
-		$dane = ["history"=>$jobLog->getHistoryByUser($id),"Counter"=>1, "user"=>$user->info($id), "groupSelectOption"=>$group->groupSelectArray()];
+		$dane = ["history"=>$jobLog->getHistoryByUser($id),"Counter"=>1, "user"=>$user->info($id), "groupSelectOption"=>$group->groupSelectArray(), "settings"=>$user->getSettings($id)];
 		return view('admin/userProfil',$dane);
 	}
 	
@@ -186,7 +202,7 @@ class IndexAdminController extends Controller {
 		$group = new Group();
 		try
 		{
-			$group->addNew();
+			$group->addNewGroup();
 		}
 		catch(\Exception $e)
 		{

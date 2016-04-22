@@ -76,6 +76,12 @@
 					@endforeach
 				  </tbody>
 				</table>
+				
+			<div class="text-center">
+				{!! $usersList->render(new \Illuminate\Pagination\BootstrapThreePresenter($usersList)) !!}
+			</div>
+				
+				
 			</div>
 			
 			 <div class="tab-pane" id="activeUsers">
@@ -120,7 +126,9 @@
 					@endforeach
 				  </tbody>
 				</table>
-			 
+			<div class="text-center">
+				{!! $usersListActive->render(new \Illuminate\Pagination\BootstrapThreePresenter($usersListActive)) !!}
+			</div>
 			 
 			 
 			 </div>
@@ -166,6 +174,11 @@
 					@endforeach
 				  </tbody>
 				</table>
+			  
+			<div class="text-center">
+				{!! $usersListNoActive->render(new \Illuminate\Pagination\BootstrapThreePresenter($usersListNoActive)) !!}
+			</div>
+			  
 			  
 			  </div>
 			

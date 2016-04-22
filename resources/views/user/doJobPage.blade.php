@@ -20,10 +20,24 @@
 	
 
 
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 testJob" style="background-color:white; border-radius:5px; ">
+			
+			<p><i>Przepisz poniższy tekst w pole, gdy skończysz pisac tekst zakończ klawiszem ENTER. Jest to tekst testowy w celu ustawienia ustawień</i></p>
+				
+				<b style="font-size:1.5em;" class="JobTextTEST">test</b>
+				<div style="width:100%; height:20px; border-top:1px solid black;"></div>
+						
+			
+				<div class="form-group">
+					<label for="textJobForm">Pisz poniżej</label>
+					<textarea class="form-control formInputTest" id="textJobForm" rows="4"></textarea>
 
+				</div>
+				
+		</div>
 
 	
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="background-color:white; border-radius:5px;">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalJob" style="background-color:white; border-radius:5px; display:none;">
 			
 			<p><i>Przepisz poniższy tekst w pole, gdy skończysz pisac tekst zakończ klawiszem ENTER i przepisuj ponownie aż zakończysz liczbe prawidłowych prób</i></p>
 				
@@ -45,31 +59,44 @@
 					<textarea class="form-control formInput" id="textJobForm" rows="4"></textarea>
 
 				</div>
+				@if($dane->attempt == 0)
 				<button class="btn btn-primary saveJob">Zakończ Zadanie</button>
-				
+				@endif
 		</div>
 	</div>
 	</div>
 	
+	
 <script>
 
-setInterval(function(){ backgroundTimer() },1);
+var shiftKey = false;
+var altKey = false;
+var CapsLock = false;
 
-var backgroundCounter = 0;
+var start = 0;
 
 
+var limit = '{!! $dane->attempt !!}';
+	
 
-function backgroundTimer()
-{
-	backgroundCounter++;
-}
+
 
 var job = {};
 job['job'] = '{!! $dane->job_id !!}';
 job['name'] = '{!! $dane->name !!}';
 job['text'] = '{!! $dane->job !!}';
-job['attempt'] = [];
+job['attempt'] = {
+	'correct':[],
+	'incorrect':[],
+	'improve': []
+};
+
+
+var jobFinish = 'correct';
+
 var finish = false;
+
+
 
 var attempt = 0;
 var attemptLeft = '{!! $dane->attempt !!}';
@@ -78,164 +105,294 @@ if(attemptLeft == 0)
 	finish = true;
 }
 
-var lastKeyUp =0;
-var dwelltime = 0;
-var dwellTimeClick =0;
+
+var data = [];
+
+
+var asciiAlt = {
+	"65":"ą",
+	"90":"ż",
+	"88":"ź",
+	"69":"ę",
+	"79":"ó",
+	"76":"ł",
+	"67":"ć",
+	"78":"ń",
+	"83":"ś"	
+}
+
+var asciiShift  = {
+	"219": "{",
+	"221":"}",
+	"220":"|",
+	"186":":",
+	"222":'"',
+	"188":"<",
+	"190":">",
+	"191":"?",
+	"189":"_",
+	"187":"+",
+	"48":")",
+	"49":"!",
+	"50":"@",
+	"51":"#",
+	"52":"$",
+	"53":"%",
+	"54":"^",
+	"55":"&",
+	"56":"*",
+	"57":"(",
+	"58":")",
+	"192":"~",
+	"16":"SHIFT"
+}
+
+var ascii = {
+	"219": "[",
+	"221":"]",
+	"220":"\\",
+	"186":";",
+	"222":"'",
+	"188":",",
+	"190":".",
+	"191":"/",
+	"189":"-",
+	"187":"+",
+	"96":0,
+	"97":1,
+	"98":2,
+	"99":3,
+	"100":4,
+	"101":5,
+	"102":6,
+	"103":7,
+	"104":8,
+	"105":9,
+	"110":",",
+	"107":"+",
+	"109":"-",
+	"106":"*",
+	"111":"/",
+	"192":"`",
+	"8":"BACKSPACE",
+	"13":"ENTER",
+	"20":"CAPSLOCK",
+	"17":"ALT",
+	"18":"ALT",
+	"32":"SPACE",
+	"16":"SHIFT"
+	
+	
+};
+
+
+var currentLock = {};
 
 
 
-var lastHold =0;
-var holdtime =0;
-var holdtimeclick =0;
 
 
-var beetween = [];
-var allBetween = 0;
-
-var lastKeyPress = 0;
-var beetweenLastTime = 0;
-
-$( ".formInput" ).keyup(function(e) {
-	if(e.which != 13){
-		if(dwellTimeClick == 1)
-		{
-			dwelltime += (backgroundCounter -  lastKeyUp);//czas wciskania(albo puszczania, od wcisniecia do puszczenia liczony)
-			//$('.dwelltime').html(dwelltime);
-			dwellTimeClick =0;
-			
-		//	$('.holdtime').html(holdtime);//czas trzymania:
-			
-		}
-
-		/*
-		//czas miedzy klawiszami to miedzy kayupem a keydownem
-		beetweenLastTime = backgroundCounter;
-		lastKeyUp = e.keyCode;
-		*/
-	}
-})
-
-$( ".formInput" ).keydown(function(e) {
-	if(e.which != 13){
-		if(dwellTimeClick == 0){
-			dwellTimeClick = 1;
-			lastKeyUp = backgroundCounter;
-			lastHold = backgroundCounter;
-		}else{
-			holdtime = holdtime + (backgroundCounter - lastHold);
-			lastHold = backgroundCounter;
-		}
-		/*
-		if(e.keyCode != lastKeyUp)
-		{
-			
-			beetween[String.fromCharCode(lastKeyUp)+'-'+String.fromCharCode(e.keyCode)] = backgroundCounter - beetweenLastTime;
-			
-			console.log(beetween);
-		}
-		*/
-	}
-});
-
-
-
-$( ".formInput" ).keypress(function(e) {
-	if(e.which != 13){
-		if(lastKeyPress != 0)
-		{
-			var bleng = beetween.length;
-			beetween[bleng] = {};
-			allBetween += backgroundCounter - beetweenLastTime;
-			beetween[bleng][String.fromCharCode(lastKeyPress)+'-'+String.fromCharCode(e.keyCode)] = backgroundCounter - beetweenLastTime;
-			//console.log(beetween);
-			
-			//$('.jsonString').html(JSON.stringify(beetween));
-			//console.log(JSON.stringify(beetween));
-		}
-		lastKeyPress = e.keyCode;
-		//console.log(String.fromCharCode(lastKeyPress));
-		beetweenLastTime = backgroundCounter;
-		
-		
-		//$('.beetween').html(allBetween);
-
-	}
-});
-
-$(".formInput").keyup(function (e) {
-    if (e.keyCode == 13) {//ENTER
-        
-    }
-});
-
-
-$( ".formInput" ).keypress(function(e) {
+$('.formInputTest').keypress(function(e){
 	if(e.which == 13)
 	{
-		var check = false;
-		if(attemptLeft - attempt > 0) check = true;
-		if(attemptLeft == 0) check = true;
-		
-		if(check){	
-			var val2 = 	$( ".formInput" ).val();	
-			val2 = val2.replace(/(\r\n|\n|\r)/gm,"");
-			if(val2 == $('.JobText').html())
+		if($('.formInputTest').val().toLowerCase() == $('.JobTextTEST').html().toLowerCase())
+		{
+			$('.testJob').hide();
+			$('.normalJob').show();
+			$( ".formInput" ).focus();
+			start = 1;
+		}
+	}
+	else
+	{
+		if (String.fromCharCode(e.keyCode) == String.fromCharCode(e.keyCode).toUpperCase()) {
+			CapsLock = true;
+		}
+		else
+		{
+			CapsLock = false;
+		}
+	}
+});
+
+
+
+
+
+
+
+
+
+function getChar(number)
+{
+	if((number >=65 && number <= 90) || (number >=48 && number <= 57))//a - z
+	{
+		var chars = String.fromCharCode(number).trim();
+		if($.isNumeric(chars))
+		{//shifta uzyc!
+			if(shiftKey)
 			{
-				
-				$( ".formInput" ).val("");
-				var cnt = job['attempt'].length;
-				job['attempt'][cnt] = {};
-				job['attempt'][cnt]['number'] = attempt++;
-				job['attempt'][cnt]['holdTime'] = holdtime;
-				job['attempt'][cnt]['keyupTime'] = dwelltime;
-				job['attempt'][cnt]['result'] = beetween;
-				lastKeyUp =0;
-				dwelltime = 0;
-				dwellTimeClick =0;
-				lastHold =0;
-				holdtime =0;
-				holdtimeclick =0;
-				beetween = [];
-				allBetween = 0;
-				lastKeyPress = 0;
-				beetweenLastTime = 0;
-				backgroundCounter = 0;
-				
-				if(attemptLeft > 0)
+				if(typeof asciiShift[number] != "undefined")
 				{
-					$('.attemptLeft').html(attemptLeft - attempt);
+					return asciiShift[number];
 				}
-				if(attemptLeft - attempt == 0)
-				{
-					finish = true;
-				}
-				
-				//console.log(job);
 			}
 			else
 			{
-				lastKeyUp =0;
-				dwelltime = 0;
-				dwellTimeClick =0;
-				lastHold =0;
-				holdtime =0;
-				holdtimeclick =0;
-				beetween = [];
-				allBetween = 0;
-				lastKeyPress = 0;
-				beetweenLastTime = 0;
-				backgroundCounter = 0;
-				$( ".formInput" ).val("");
-			}	
-		
+				return chars;
+			}		
+		}
+		else
+		{
+			if(altKey)
+			{
+				if(typeof asciiAlt[number] != "undefined")
+				{
+					chars =  asciiAlt[number];
+				}
+			}
+			
+			if(CapsLock && shiftKey)
+			{
+				return chars.toLowerCase();
+			}
+			else if(!CapsLock && !shiftKey)
+			{
+				return chars.toLowerCase();
+			}
+			else if(CapsLock && !shiftKey)
+			{
+				return chars.toUpperCase();
+			}
+			else
+			{
+				return chars.toUpperCase();
+			}
 		}
 	}
+	else
+	{
+		if(shiftKey)
+		{
+			return asciiShift[number];
+		}
+		else
+		{
+			if(typeof ascii[number] != "undefined")
+			{
+				return ascii[number];
+			}
+		}
+	}
+
+}
+
+
+$( ".formInput" ).keydown(function(e) {
+if(e.keyCode == 18) e.keyCode = 17;
+	if(start == 2)
+	{
+		if(e.keyCode == 20)
+		{
+			CapsLock = (CapsLock == true)? false : true;
+		}
+		if(e.keyCode == 16)
+		{
+			if(shiftKey == false) shiftKey = true;
+		}
+		if(e.keyCode == 17)
+		{
+			if(altKey == false) altKey = true;
+		}
+		
+		
+			var key = getChar(e.keyCode);
+			
+			if(typeof currentLock[e.keyCode] == "undefined" || currentLock[e.keyCode] == 0)
+			{
+				data[data.length] = [Date.now(),key,'keydown'];
+				
+				currentLock[e.keyCode] = 1;
+			}
+	}
 });
+
+
+
+
+
+$(".formInput").keyup(function (e) {
+if(e.keyCode == 18) e.keyCode = 17;
+	if(start == 2)
+	{
+		if(e.keyCode == 16)
+		{
+			if(shiftKey == true) shiftKey = false;
+		}
+		if(e.keyCode == 17)
+		{
+			if(altKey == true) altKey = false;
+		}
+		
+			if(e.keyCode == 18) e.keyCode = 17;
+			if(currentLock[e.keyCode] == 1)
+			{
+				var key = getChar(e.keyCode);
+				data[data.length] = [Date.now(),key,'keyup'];
+				currentLock[e.keyCode] = 0;
+			}
+		
+		if(e.keyCode == 8)
+		{
+			jobFinish = "improve";
+		}
+		
+		if(e.keyCode == 13)
+		{
+			var val2 = 	$( ".formInput" ).val();	
+			val2 = val2.replace(/(\r\n|\n|\r)/gm,"");
+			if(val2 != $('.JobText').html())
+			{
+				jobFinish = 'incorrect';
+			}
+
+			job['attempt'][jobFinish][job['attempt'][jobFinish].length] = data;
+			data = [];
+			attempt++;
+			jobFinish = 'correct';
+			$('.attemptLeft').html(attemptLeft - attempt);
+			$( ".formInput" ).val("");
+			if(attemptLeft - attempt <= 0)
+			{
+				if(limit > 0)
+				{
+						$.post("{!! URL::to('/user/completeJob') !!}",
+							{ 	_token : "{!! csrf_token() !!}",
+											result : JSON.stringify(job),
+											job : "{!! $dane->job_id !!}"
+							},		 
+								function(data){
+									if(data == ""){
+										window.location.href = "{!! URL::to('/user/panel') !!}";
+									}
+								}
+							).error(function(request, status, error){///
+								$('.logError2').html(firstJsonResponse(request.responseText));
+						});
+				}
+			}
+		}
+	}
+	if(start == 1) start = 2;
+});
+
+
 
 
 $('.saveJob').click(function(e){
 	if(finish)
 	{
+
 		$.post("{!! URL::to('/user/completeJob') !!}",
 			{ 	_token : "{!! csrf_token() !!}",
 							result : JSON.stringify(job),
@@ -252,6 +409,6 @@ $('.saveJob').click(function(e){
 	}
 });
 
-</script>	
+</script>		
 
 </body>

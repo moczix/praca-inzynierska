@@ -1,4 +1,4 @@
-@include('admin.pageHeader')
+@include('user.pageHeader')
 
 	@if(isset($goodMsg))
 	<div class="alert alert-success alert-dismissable col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-4 col-md-offset-4 col-sm-offset-4">
@@ -73,17 +73,6 @@
 					</td>
 				</tr>
 				<tr>
-					<th>Status</th>
-					<td>
-					@if($user[0]['active'])
-						Aktywne
-					@else
-						Nieaktywne
-					@endif
-					<a href="{!! url::to('admin/changeStatus',array('id'=>$user[0]['uuid'])) !!}">Zmień</a></td>
-					</td>
-				</tr>
-				<tr>
 					<th>Grupa</th>
 					<td>
 					(
@@ -93,65 +82,128 @@
 						Brak
 					@endif
 					)
-					<a href="#" class="chooseGroup" data-user="{!! $user[0]['uuid'] !!}" data-toggle="modal" data-target="#editGroup">Zmień</a>
 					</td>
 				</tr>
-				
-				
+			
 				<tr>
 					<th>Płeć</th>
 					<td>
+<div class="radio">
+  <label>
+    <input type="radio" name="gender" id="gender" value="1" 
 		@if($settings->gender == 1)
-		Męszczyzna
-		@else
-		Kobieta
+		checked
 		@endif
-		
+	>
+	
+    Męższczyzna
+  </label>
+</div>
+<div class="radio">
+  <label>
+    <input type="radio" name="gender" id="gender" value="2"
+		@if($settings->gender == 2)
+		checked
+		@endif
+	>
+    Kobieta
+  </label>
+</div>
 					</td>
 				</tr>
-				
+			
+			
 				<tr>
-					<th>Pisanie</th>
+					<th>Praworęczny / Leworęczny</th>
 					<td>
+<div class="radio">
+  <label>
+    <input type="radio" name="hand" id="hand" value="1"
 		@if($settings->hand == 1)
-		Praworęczny/a
-		@else
-		Leworęczny/a
+		checked
 		@endif
+	>
+    Praworęczny
+  </label>
+</div>
+<div class="radio">
+  <label>
+    <input type="radio" name="hand" id="hand" value="2"
+		@if($settings->hand == 2)
+		checked
+		@endif
+	>
+    lewyręczny
+  </label>
+</div>
 					</td>
 				</tr>
-				
+			
 				<tr>
 					<th>Urządzenie</th>
 					<td>
+<div class="radio">
+  <label>
+    <input type="radio" name="device" id="device" value="1"
 		@if($settings->device == 1)
-		PC stacjonarny
-		@else
-		Laptop
+		checked
 		@endif
+	>
+    Komputer
+  </label>
+</div>
+<div class="radio">
+  <label>
+    <input type="radio" name="device" id="device" value="2"
+		@if($settings->device == 2)
+		checked
+		@endif
+	>
+    Laptop
+  </label>
+</div>
 					</td>
 				</tr>
 				
 				<tr>
 					<th>Klawiatura</th>
 					<td>
+<div class="radio">
+  <label>
+    <input type="radio" name="keyboard" id="keyboard" value="1"
 		@if($settings->keyboard == 1)
-		Fizyczna
-		@else
-		Dotykowa
+		checked
 		@endif
+	>
+    Fizyczna
+  </label>
+</div>
+<div class="radio">
+  <label>
+    <input type="radio" name="keyboard" id="keyboard" value="2"
+		@if($settings->keyboard == 2)
+		checked
+		@endif
+	>
+    Dotykowa
+  </label>
+</div>
 					</td>
 				</tr>
 				
 				<tr>
 					<th>Data urodzenia</th>
 					<td>
-					{!! $settings->birthString !!}
+						<div class="form-group">
+							<input type="text" class="form-control" id="birth" placeholder="dd/mm/yyyy" value="{!! $settings->birthString !!}">
+						</div>
 					</td>
 				</tr>
 			
-			</table>
 			
+			</table>
+		<b><span style="color:#b20a07;" class="settingsError"></span><br></b>
+		<button class="btn btn-primary saveSettings">Zapisz Ustawienia</button>
 			
 		</div>
 	
@@ -167,7 +219,6 @@
 				  <th>Użytkownik</th>
 				  <th>Data</th>
 				  <th>Pokaż</th>
-				  <th>Skasuj</th>
 				</tr>
 			  </thead>
 			  <tbody>
@@ -176,8 +227,7 @@
 				  <td>{!! $Counter++ !!}</td>
 				  <td>{!! $hs->user->username !!}</td>
 				  <td>{!! date('Y-m-d H:i:s',$hs->date) !!}</td>
-				  <td><a href="{!! url::to('admin/getDetailsHistory',array('id'=>$hs->log_id)) !!}" target="_blank" >Pokaż</a></td>
-				  <td><a href="{!! url::to('admin/delHistory',array('id'=>$hs->log_id)) !!}">Skasuj</a></td>
+				  <td><a href="{!! url::to('user/getDetailsHistory',array('id'=>$hs->log_id)) !!}" target="_blank" >Pokaż</a></td>
 				</tr>
 				@endforeach;
 
@@ -305,41 +355,58 @@
 			$('.currentEmail').html($(this).data('current'));
 		});
 		
-		$('.chooseGroup').click(function(e){
-			e.preventDefault();
-			user = $(this).data('user');
-		});
 	//zastanow sie czy ma byc POST czy ma byc GET (wg mnie obojetne xD ale teoretycznie powinien byc get)
 $('.showMeS').click(function(e){
 	e.preventDefault();
 	var ids = this.id;
-	console.log("{!! URL::to('/admin/getDetailsHistory') !!}/"+ids);
-	$.get( "{!! URL::to('/admin/getDetailsHistory') !!}/"+ids, function( data ) {
+	console.log("{!! URL::to('/user/getDetailsHistory') !!}/"+ids);
+	$.get( "{!! URL::to('/user/getDetailsHistory') !!}/"+ids, function( data ) {
 	  $('.hisDTL').html(data);
 	});
 });
 
 
-$('.editUser').click(function(e){
-$.post("{!! URL::to('/admin/chooseGroup') !!}",
-		{ 	_token : $('#EditUserForm input[name=_token]').val(),
-						group : $('#EditUserForm #GroupSelect').val(),
-						user : user
-		},		 
-			function(data){
-				if(data == ""){
-					location.reload();
-				}
-			}
-		).error(function(request, status, error){///
-			$('.logError2').html(firstJsonResponse(request.responseText));
-	});
 
-});		
+$('.saveSettings').click(function(e)
+{
+	var token = $('#changePsw input[name=_token]').val();
+	var hand = $('#hand:checked').val();
+	
+	var keyboard = $('#keyboard:checked').val();
+	var device = $('#device:checked').val();
+	var gender = $('#gender:checked').val();
+	
+	var birth = $('#birth').val();
+	if(typeof hand != "undefined" && typeof keyboard != "undefined" && typeof device != "undefined" && typeof gender != "undefined" && birth != "" )
+	{
+			$.post("{!! URL::to('/user/changeSettings') !!}",
+					{ 	_token : token,
+									hand : hand,
+									keyboard : keyboard,
+									device: device,
+									birth: birth,
+									gender: gender
+									
+					},		 
+						function(data){
+							if(data == ""){
+								location.reload();
+							}
+						}
+					).error(function(request, status, error){///
+						$('.settingsError').html(firstJsonResponse(request.responseText));
+				});
+	}
+	else
+	{
+		$('.settingsError').html("Zaznacz opcje i uzupełnij datę urodzenia");
+	}
+	
+});
 	
 	
 $('.savePSW').click(function(e){
-$.post("{!! URL::to('/admin/changePSW') !!}",
+$.post("{!! URL::to('/user/changePSW') !!}",
 		{ 	_token : $('#changePsw input[name=_token]').val(),
 						psw : $('#changePsw #pswForm').val(),
 						user : user2
@@ -358,7 +425,7 @@ $.post("{!! URL::to('/admin/changePSW') !!}",
 
 
 $('.saveEmail').click(function(e){
-$.post("{!! URL::to('/admin/changeEmail') !!}",
+$.post("{!! URL::to('/user/changeEmail') !!}",
 		{ 	_token : $('#changeEmail input[name=_token]').val(),
 						email : $('#changeEmail #emailForm').val(),
 						user : user2
